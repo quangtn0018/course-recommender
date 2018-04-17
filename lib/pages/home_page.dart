@@ -18,12 +18,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final Authentication _auth = Authentication();
   List<Course> _savedCourses;
-  bool _isEditMode = false;
+  bool _isEditMode;
 
   @override
   void initState() {
     super.initState();
 
+    _isEditMode = false;
     _savedCourses = List<Course>();
     _auth.firebaseAuth.currentUser().then((FirebaseUser user) {
       if (user == null) {

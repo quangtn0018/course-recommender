@@ -17,14 +17,19 @@ class AddCoursesPage extends StatefulWidget {
 }
 
 class _AddCoursesPageState extends State<AddCoursesPage> {
-  final List<Course> _courses = GetCourses().generateCSCoursesList();
   final Authentication _auth = Authentication();
+  List<Course> _courses;
+  Map<String, Course> _selectedCourses;
   String _userUID;
-  Map<String, Course> _selectedCourses = Map<String, Course>();
+  bool _isAddMode;
 
   @override
   void initState() {
     super.initState();
+
+    initCourses();
+    _selectedCourses = Map<String, Course>();
+    _isAddMode = false;
     _auth.firebaseAuth.currentUser().then((FirebaseUser user) {
       if (user == null) {
         Navigator.of(context).pushReplacementNamed(LoginPage.tag);
@@ -32,6 +37,14 @@ class _AddCoursesPageState extends State<AddCoursesPage> {
         _userUID = user.uid;
       }
     });
+  }
+
+  void initCourses() {
+    _courses = GetCourses().generateCSCoursesList();
+  }
+
+  void clearSelectedCourses() {
+    _selectedCourses.clear();
   }
 
   Future<Null> _addCoursesToDB() async {
@@ -82,7 +95,7 @@ class _AddCoursesPageState extends State<AddCoursesPage> {
         });
   }
 
-  void _handleListTileOnChanged(bool checkboxVal, int index) {
+  void _handleCheckboxOnChanged(bool checkboxVal, int index) {
     if (!checkboxVal) {
       _selectedCourses.remove(_courses[index].name);
     } else {
@@ -94,9 +107,24 @@ class _AddCoursesPageState extends State<AddCoursesPage> {
     });
   }
 
+  void _toggleIsAddMode() {
+    setState(() {
+      _isAddMode = !_isAddMode;
+
+      if (!_isAddMode) {
+        clearSelectedCourses();
+        initCourses();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.note_add),
+        onPressed: _toggleIsAddMode,
+      ),
       appBar: AppBar(
         title: Text('Add Courses'),
         actions: <Widget>[
@@ -107,21 +135,62 @@ class _AddCoursesPageState extends State<AddCoursesPage> {
         ],
       ),
       body: ListView.builder(
-          itemCount: _courses.length,
-          itemBuilder: (context, index) {
-            return Column(children: <Widget>[
-              CheckboxListTile(
+        itemCount: _courses.length,
+        itemBuilder: (context, index) {
+          return Card(
+              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+              child: ExpansionTile(
+                key: PageStorageKey<String>(_courses[index].name),
+                title: ListTile(
                   title: Text('${_courses[index].name}'),
-                  subtitle: Text('${_courses[index].title}'),
-                  value: _courses[index].selected,
-                  onChanged: (bool checkboxVal) {
-                    _handleListTileOnChanged(checkboxVal, index);
-                  }),
-              Divider(
-                height: 1.0,
-              )
-            ]);
-          }),
+                  subtitle: Text(
+                    '${_courses[index].title}',
+                  ),
+                  leading: _isAddMode
+                      ? Checkbox(
+                          value: _courses[index].selected,
+                          onChanged: (bool checkboxVal) {
+                            _handleCheckboxOnChanged(checkboxVal, index);
+                          })
+                      : null,
+                ),
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.fromLTRB(17.0, 0.0, 20.0, 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        SizedBox(
+                          height: 5.0,
+                        ),
+                        Text('Units: ${_courses[index].units}'),
+                        SizedBox(
+                          height: 20.0,
+                        ),
+                        Text('Prerequisite'),
+                        SizedBox(
+                          height: 3.0,
+                        ),
+                        Padding(
+                            padding: EdgeInsets.only(left: 5.0),
+                            child: Text('${_courses[index].prereq}')),
+                        SizedBox(
+                          height: 20.0,
+                        ),
+                        Text('Description'),
+                        SizedBox(
+                          height: 3.0,
+                        ),
+                        Padding(
+                            padding: EdgeInsets.only(left: 5.0),
+                            child: Text('${_courses[index].description}')),
+                      ],
+                    ),
+                  )
+                ],
+              ));
+        },
+      ),
     );
   }
 }
