@@ -6,7 +6,7 @@ class Course {
     final String description;
     final String prereq;
     final String units;
-    bool selectedForAdding;
+    bool selected;
     
     Course({
         this.name,
@@ -14,7 +14,7 @@ class Course {
         this.description,
         this.prereq,
         this.units,
-        this.selectedForAdding = false,
+        this.selected = false,
     }) : assert(name != null),
         assert(title != null),
         assert(description != null),
@@ -27,7 +27,8 @@ class Course {
             'title': title,
             'description': description,
             'prereq': prereq,
-            'units': units
+            'units': units,
+            'selected': selected
         };
     }
 
@@ -36,8 +37,9 @@ class Course {
         title = snapshot.value['title'],
         description = snapshot.value['description'],
         prereq = snapshot.value['prereq'],
-        units = snapshot.value['units'];
+        units = snapshot.value['units'],
+        selected = snapshot.value['selected'];
                                                 
 
-    void toggleSelectedForAdding() => selectedForAdding = !selectedForAdding;
+    void toggleSelected() => selected = !selected;
 }

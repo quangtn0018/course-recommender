@@ -13,13 +13,13 @@ import '../util/get_courses.dart';
 class AddCoursesPage extends StatefulWidget {
   static String tag = 'add-courses-page';
   @override
-  _AddCoursesPageState createState() =>  _AddCoursesPageState();
+  _AddCoursesPageState createState() => _AddCoursesPageState();
 }
 
 class _AddCoursesPageState extends State<AddCoursesPage> {
   final List<Course> _courses = GetCourses().generateCSCoursesList();
   final Authentication _auth = Authentication();
-  String _userUID;  
+  String _userUID;
   Map<String, Course> _selectedCourses = Map<String, Course>();
 
   @override
@@ -35,49 +35,51 @@ class _AddCoursesPageState extends State<AddCoursesPage> {
   }
 
   Future<Null> _addCoursesToDB() async {
-    final userCoursesRef = FirebaseDatabase.instance.reference().child('users/$_userUID/courses');
+    final userCoursesRef =
+        FirebaseDatabase.instance.reference().child('users/$_userUID/courses');
     Map<String, dynamic> newVal = Map<String, dynamic>();
-    
+
     _selectedCourses.forEach((key, value) {
       newVal[key] = value.toJson();
     });
 
     userCoursesRef.update(newVal);
   }
-  
+
   Future<Null> _askedToSaveCourses() async {
     await showDialog<Null>(
-      context: context,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          title: const Text(
-            'Add Selected Courses?', 
-            textAlign: TextAlign.center,
-          ),
-          children: <Widget>[
-            SizedBox(height: 20.0),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: SimpleDialogOption(
-                    onPressed: () { Navigator.pop(context); },
-                    child: const Text('Cancel', textAlign: TextAlign.center,),
-                  )
-                ),
-                Expanded(
-                  child: SimpleDialogOption(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: Text(
+              'Add Selected Courses?',
+            ),
+            children: <Widget>[
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  SimpleDialogOption(
                     onPressed: () {
-                      _addCoursesToDB().then((_) =>Navigator.popAndPushNamed(context, HomePage.tag));
+                      Navigator.pop(context);
                     },
-                    child: const Text('Submit', textAlign: TextAlign.center,),
+                    child: Text(
+                      'Cancel',
+                    ),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () {
+                      _addCoursesToDB().then((_) =>
+                          Navigator.popAndPushNamed(context, HomePage.tag));
+                    },
+                    child: Text(
+                      'Submit',
+                    ),
                   )
-                )
-              ],
-            )
-          ],
-        );
-      }
-    );
+                ],
+              )
+            ],
+          );
+        });
   }
 
   void _handleListTileOnChanged(bool checkboxVal, int index) {
@@ -88,7 +90,7 @@ class _AddCoursesPageState extends State<AddCoursesPage> {
     }
 
     setState(() {
-      _courses[index].toggleSelectedForAdding();
+      _courses[index].toggleSelected();
     });
   }
 
@@ -105,18 +107,21 @@ class _AddCoursesPageState extends State<AddCoursesPage> {
         ],
       ),
       body: ListView.builder(
-        itemCount: _courses.length,
-        itemBuilder: (context, index) {
-          return CheckboxListTile(
-            title: Text('${_courses[index].name}'),
-            subtitle: Text('${_courses[index].title}'),
-            value: _courses[index].selectedForAdding,
-            onChanged: (bool checkboxVal) {
-              _handleListTileOnChanged(checkboxVal, index);
-            }
-          );
-        },
-      ),
+          itemCount: _courses.length,
+          itemBuilder: (context, index) {
+            return Column(children: <Widget>[
+              CheckboxListTile(
+                  title: Text('${_courses[index].name}'),
+                  subtitle: Text('${_courses[index].title}'),
+                  value: _courses[index].selected,
+                  onChanged: (bool checkboxVal) {
+                    _handleListTileOnChanged(checkboxVal, index);
+                  }),
+              Divider(
+                height: 1.0,
+              )
+            ]);
+          }),
     );
   }
 }
