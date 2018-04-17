@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "589859115063",
+    "firebase_url": "https://courserec-f2632.firebaseio.com",
+    "project_id": "courserec-f2632",
+    "storage_bucket": "courserec-f2632.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:589859115063:android:7203a0a840f6cf3b",
+        "android_client_info": {
+          "package_name": "com.example.courserecommender"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "589859115063-r6ru96sjlt73i9t90ptei7fj72t25b19.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.courserecommender",
+            "certificate_hash": "0eead34755041c494d1b9fede6a2ff3389b06f61"
+          }
+        },
+        {
+          "client_id": "589859115063-ns42c3s8e0gn7q9flp1f92bhs5e5svnb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4NdGFdgYmlFprq7lpVKk1YTg2N-XYKk4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "589859115063-ns42c3s8e0gn7q9flp1f92bhs5e5svnb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "589859115063-jisakc8qf1r5j0gj400kk36d4krmnk28.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.courseRecommender"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
