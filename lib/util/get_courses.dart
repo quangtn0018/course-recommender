@@ -14,11 +14,12 @@ class GetCourses {
     List<Course> result = List<Course>();
 
     courses.forEach((_, value) {
-      result.add(Course(name: value.name, 
-                  title: value.title,
-                  description: value.description,
-                  prereq: value.prereq,
-                  units: value.units));
+      result.add(Course(
+          name: value.name,
+          title: value.title,
+          description: value.description,
+          prereq: value.prereq,
+          units: value.units));
     });
 
     return result;

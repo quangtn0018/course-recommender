@@ -50,5 +50,4 @@ class Authentication {
     // Sign out with google
     await _googleSignIn.signOut();
   }
-
 }

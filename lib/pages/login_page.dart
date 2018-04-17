@@ -23,18 +23,21 @@ class _LoginPageState extends State<LoginPage> {
 
     // Listen for our auth event (on reload or start)
     // Go to our homepage page once logged in
-    _auth.firebaseAuth.onAuthStateChanged.firstWhere((user) => user != null).then((user) {
-      final userRef = FirebaseDatabase.instance.reference().child('users/${user.uid}');
-      
+    _auth.firebaseAuth.onAuthStateChanged
+        .firstWhere((user) => user != null)
+        .then((user) {
+      final userRef =
+          FirebaseDatabase.instance.reference().child('users/${user.uid}');
+
       userRef.once().then((snapshot) {
         final value = snapshot.value;
 
         if (value == null) {
-          final newUserVal = {
-            'email': user.email
-          };
-      
-          userRef.set(newUserVal).then((_) => Navigator.of(context).pushNamed(HomePage.tag));
+          final newUserVal = {'email': user.email};
+
+          userRef
+              .set(newUserVal)
+              .then((_) => Navigator.of(context).pushNamed(HomePage.tag));
         } else {
           Navigator.of(context).pushNamed(HomePage.tag);
         }
@@ -57,33 +60,33 @@ class _LoginPageState extends State<LoginPage> {
         _isLoading = false;
       });
     }
-    
   }
 
   @override
   Widget build(BuildContext context) {
-    final appTitleLabel =  Text(
+    final appTitleLabel = Text(
       'CourseRecommender',
       textAlign: TextAlign.center,
-      style:  TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
+      style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold),
     );
-    
-    final loginWithGoogleButton =  Padding(
-      padding:  EdgeInsets.only(top: 16.0, bottom: 8.0),
-      child:  Material(
-        borderRadius:  BorderRadius.circular(30.0),
+
+    final loginWithGoogleButton = Padding(
+      padding: EdgeInsets.only(top: 16.0, bottom: 8.0),
+      child: Material(
+        borderRadius: BorderRadius.circular(30.0),
         shadowColor: Colors.lightBlueAccent.shade100,
         elevation: 5.0,
-        child:  MaterialButton(
+        child: MaterialButton(
           minWidth: 200.0,
           height: 42.0,
           onPressed: _handleLogin,
           color: Colors.lightBlueAccent,
-          child:  Text('Log In With Google', style:  TextStyle(color: Colors.white)),
+          child:
+              Text('Log In With Google', style: TextStyle(color: Colors.white)),
         ),
       ),
     );
-    
+
     if (_isLoading) {
       return LoadingIndicator();
     }
@@ -92,22 +95,21 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Colors.white,
       body: Center(
         child: ListView(
-            shrinkWrap: true,
-            padding: EdgeInsets.only(left: 24.0, right: 24.0),
-            children: <Widget>[
-              appTitleLabel,
-               SizedBox(height: 20.0),
-               Padding(
+          shrinkWrap: true,
+          padding: EdgeInsets.only(left: 24.0, right: 24.0),
+          children: <Widget>[
+            appTitleLabel,
+            SizedBox(height: 20.0),
+            Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
-                    children: [
-                      loginWithGoogleButton,  
-                    ],
-                  )
-                ),
-            ],
-          ),
+                  children: [
+                    loginWithGoogleButton,
+                  ],
+                )),
+          ],
         ),
-      );
+      ),
+    );
   }
 }
