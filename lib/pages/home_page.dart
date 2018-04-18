@@ -19,6 +19,7 @@ class _HomePageState extends State<HomePage> {
   final Authentication _auth = Authentication();
   List<Course> _savedCourses;
   bool _isEditMode;
+  String _userUID;
 
   @override
   void initState() {
@@ -30,27 +31,30 @@ class _HomePageState extends State<HomePage> {
       if (user == null) {
         Navigator.of(context).pushReplacementNamed(LoginPage.tag);
       } else {
-        // TODO fetchUserCourses
-        final userCoursesRef = FirebaseDatabase.instance
-            .reference()
-            .child('users/${user.uid}/courses');
-        userCoursesRef.onChildAdded.listen(_onCourseAdded);
-        userCoursesRef.onChildRemoved.listen(_onCourseRemoved);
+        _userUID = user.uid;
+        fetchUserCourses();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    final userCoursesRef =
+        FirebaseDatabase.instance.reference().child('users/$_userUID/courses');
+    userCoursesRef.onChildAdded.listen(_onCourseAdded).cancel();
+    super.dispose();
+  }
+
+  void fetchUserCourses() {
+    final userCoursesRef =
+        FirebaseDatabase.instance.reference().child('users/$_userUID/courses');
+    userCoursesRef.onChildAdded.listen(_onCourseAdded);
   }
 
   void _onCourseAdded(Event event) {
     setState(() {
       _savedCourses.add(Course.fromSnapshot(event.snapshot));
     });
-  }
-
-  void _onCourseRemoved(Event event) {
-    // TODO implement remove ??
-    // setState(() {
-    //    _savedCourses.remove(Course.fromSnapshot(event.snapshot));
-    // });
   }
 
   void _toggleIsEditMode() {
@@ -65,10 +69,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _navToAddCourses() {
+    _isEditMode = false;
     Navigator.of(context).pushNamed(AddCoursesPage.tag);
   }
 
-  Future<Null> _removeCourseFromDB() async {}
+  Future<Null> _removeCourseFromDB(String courseName) async {
+    final userCourseRef = FirebaseDatabase.instance
+        .reference()
+        .child('users/${_userUID}/courses/$courseName');
+
+    await userCourseRef.remove();
+  }
+
+  void _removeCourseFromList(int index) {
+    setState(() {
+      _savedCourses.remove(_savedCourses[index]);
+    });
+  }
 
   Future<Null> _askedToRemoveCourse(int index) async {
     await showDialog<Null>(
@@ -92,7 +109,9 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SimpleDialogOption(
                     onPressed: () {
-                      _removeCourseFromDB();
+                      _removeCourseFromDB(_savedCourses[index].name);
+                      _removeCourseFromList(index);
+                      Navigator.pop(context);
                     },
                     child: Text(
                       'Submit',

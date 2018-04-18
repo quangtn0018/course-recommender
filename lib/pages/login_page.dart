@@ -63,6 +63,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final appTitleLabel = Text(
       'CourseRecommender',
