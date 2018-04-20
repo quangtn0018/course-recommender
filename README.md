@@ -1,4 +1,9 @@
 # course_recommender
+## Demo
+It also works and looks the same on the iPhone.
+
+![Demo](https://user-images.githubusercontent.com/27994047/39069411-826eb44c-4494-11e8-92e3-fb8cfd27e6af.gif)
+
 ## Getting Started
 
 For help getting started with Flutter, view our online
