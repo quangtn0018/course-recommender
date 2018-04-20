@@ -153,8 +153,9 @@ class _HomePageState extends State<HomePage> {
             onPressed: _navToAddCourses,
           ),
           FlatButton(
-            child: Text('rec courses'),
-            onPressed: _navToRecommendedCourses,
+            textColor: Colors.white,
+            child: Text('Get Rec Courses'),
+            onPressed: _savedCourses.length > 0 ? _navToRecommendedCourses : null,
           )
         ],
       ),
