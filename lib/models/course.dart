@@ -32,6 +32,14 @@ class Course {
     };
   }
 
+  Course.fromJson(dynamic course)
+      : name = course['name'],
+        title = course['title'],
+        description = course['description'],
+        prereq = course['prereq'],
+        units = course['units'],
+        selected = false;
+
   Course.fromSnapshot(DataSnapshot snapshot)
       : name = snapshot.value['name'],
         title = snapshot.value['title'],

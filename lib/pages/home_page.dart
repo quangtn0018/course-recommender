@@ -6,6 +6,7 @@ import 'package:firebase_database/firebase_database.dart';
 
 import 'login_page.dart';
 import 'add_courses_page.dart';
+import 'recommended_courses_page.dart';
 import '../util/authentication.dart';
 import '../models/course.dart';
 
@@ -73,10 +74,18 @@ class _HomePageState extends State<HomePage> {
     Navigator.of(context).pushNamed(AddCoursesPage.tag);
   }
 
+  void _navToRecommendedCourses() {
+    _isEditMode = false;
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => RecommendedCoursesPage(_userUID)));
+  }
+
   Future<Null> _removeCourseFromDB(String courseName) async {
     final userCourseRef = FirebaseDatabase.instance
         .reference()
-        .child('users/${_userUID}/courses/$courseName');
+        .child('users/$_userUID/courses/$courseName');
 
     await userCourseRef.remove();
   }
@@ -142,6 +151,10 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: _navToAddCourses,
+          ),
+          FlatButton(
+            child: Text('rec courses'),
+            onPressed: _navToRecommendedCourses,
           )
         ],
       ),
