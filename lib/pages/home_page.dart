@@ -136,27 +136,18 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.edit),
-        onPressed: () {
-          _toggleIsEditMode();
-        },
-      ),
+      floatingActionButton: 
+        _savedCourses.length > 0 ? FloatingActionButton(
+          child: Icon(Icons.layers),
+          onPressed: _navToRecommendedCourses,
+        ) : null ,
       appBar: AppBar(
         title: Text('My Courses'),
         automaticallyImplyLeading: false,
-        leading:
-            IconButton(icon: Icon(Icons.exit_to_app), onPressed: _handleLogout),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: _navToAddCourses,
-          ),
-          FlatButton(
-            textColor: Colors.white,
-            child: Text('Get Rec Courses'),
-            onPressed: _savedCourses.length > 0 ? _navToRecommendedCourses : null,
-          )
+        leading: IconButton(icon: Icon(Icons.exit_to_app), onPressed: _handleLogout),
+        actions: <Widget> [
+          IconButton(icon:Icon(Icons.edit), onPressed: _toggleIsEditMode),
+          IconButton(icon: Icon(Icons.add), onPressed: _navToAddCourses),
         ],
       ),
       body: ListView.builder(
@@ -173,7 +164,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   leading: _isEditMode
                       ? IconButton(
-                          icon: Icon(Icons.remove_circle),
+                          icon: Icon(Icons.delete),
                           onPressed: () {
                             _askedToRemoveCourse(index);
                           },

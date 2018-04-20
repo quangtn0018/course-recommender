@@ -18,16 +18,22 @@ class AddCoursesPage extends StatefulWidget {
 
 class _AddCoursesPageState extends State<AddCoursesPage> {
   final Authentication _auth = Authentication();
+  final _searchTextFieldController = TextEditingController();
+  List<Course> _filteredCourses;
   List<Course> _courses;
   Map<String, Course> _selectedCourses;
   String _userUID;
   bool _isAddMode;
+  bool _isSearchMode;
 
   @override
   void initState() {
     super.initState();
 
     initCourses();
+    _filteredCourses = List<Course>();
+    _isSearchMode = false;
+    _searchTextFieldController.addListener(_handleSearchTextFieldOnChange);
     _selectedCourses = Map<String, Course>();
     _isAddMode = false;
     _auth.firebaseAuth.currentUser().then((FirebaseUser user) {
@@ -36,6 +42,53 @@ class _AddCoursesPageState extends State<AddCoursesPage> {
       } else {
         _userUID = user.uid;
       }
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchTextFieldController.removeListener(_handleSearchTextFieldOnChange);
+    _searchTextFieldController.dispose();
+
+    super.dispose();
+  }
+
+  void _displaySearchBar() {
+    _filteredCourses = _courses.sublist(0);
+
+    setState(() {
+      _isSearchMode = true;
+    });
+  }
+
+  void _hideSearchBar() {
+    _clearSearchTextField();
+    _filteredCourses.clear();
+
+    setState(() {
+      _isSearchMode = false;   
+    });
+  }
+
+  void _clearSearchTextField() {
+    _searchTextFieldController.clear();
+  }
+
+  void _handleSearchTextFieldOnChange() {
+    _filterSearches();
+  }
+
+  void _filterSearches() {
+    List<Course> filteredCourses = List<Course>();
+
+    _courses.forEach((Course course) {
+      if (course.name.toLowerCase().contains(_searchTextFieldController.text.trim().toLowerCase())) {
+        filteredCourses.add(course);
+      }
+    });   
+
+    setState(() {
+      _filteredCourses = filteredCourses;
     });
   }
 
@@ -120,21 +173,94 @@ class _AddCoursesPageState extends State<AddCoursesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.note_add),
-        onPressed: _toggleIsAddMode,
+    final TextField searchTextField = TextField(
+      controller: _searchTextFieldController,
+      decoration: InputDecoration(
+        hintText: 'Search',
       ),
-      appBar: AppBar(
-        title: Text('Add Courses'),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.save_alt),
-            onPressed: _selectedCourses.length > 0 ? _askedToSaveCourses : null,
-          )
-        ],
-      ),
-      body: ListView.builder(
+    );
+
+    final AppBar appBar = AppBar(
+        title: _isSearchMode ? 
+          searchTextField
+          : Text('Add Courses'),
+        leading: _isSearchMode ? 
+            IconButton(icon: Icon(Icons.arrow_back), onPressed: _hideSearchBar) : null, 
+        actions: _isSearchMode ? 
+          <Widget> [
+            IconButton(icon: Icon(Icons.clear), onPressed: _clearSearchTextField)
+          ] : <Widget>[
+                IconButton(icon:Icon(Icons.search), onPressed: _displaySearchBar),
+                IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: _toggleIsAddMode
+                ),
+                IconButton(
+                  icon: Icon(Icons.save_alt),
+                  onPressed: _selectedCourses.length > 0 ? _askedToSaveCourses : null,
+                )
+              ],
+    );
+
+    final ListView filteredListView = ListView.builder(
+        itemCount: _filteredCourses.length,
+        itemBuilder: (context, index) {
+          return Card(
+              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+              child: ExpansionTile(
+                key: PageStorageKey<String>(_filteredCourses[index].name),
+                title: ListTile(
+                  title: Text('${_filteredCourses[index].name}'),
+                  subtitle: Text(
+                    '${_filteredCourses[index].title}',
+                  ),
+                  leading: _isAddMode
+                      ? Checkbox(
+                          value: _filteredCourses[index].selected,
+                          onChanged: (bool checkboxVal) {
+                            _handleCheckboxOnChanged(checkboxVal, index);
+                          })
+                      : null,
+                ),
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.fromLTRB(17.0, 0.0, 20.0, 20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        SizedBox(
+                          height: 5.0,
+                        ),
+                        Text('Units: ${_filteredCourses[index].units}'),
+                        SizedBox(
+                          height: 20.0,
+                        ),
+                        Text('Prerequisite'),
+                        SizedBox(
+                          height: 3.0,
+                        ),
+                        Padding(
+                            padding: EdgeInsets.only(left: 5.0),
+                            child: Text('${_filteredCourses[index].prereq}')),
+                        SizedBox(
+                          height: 20.0,
+                        ),
+                        Text('Description'),
+                        SizedBox(
+                          height: 3.0,
+                        ),
+                        Padding(
+                            padding: EdgeInsets.only(left: 5.0),
+                            child: Text('${_filteredCourses[index].description}')),
+                      ],
+                    ),
+                  )
+                ],
+              ));
+        },
+      );
+
+    final ListView defaultListView = ListView.builder(
         itemCount: _courses.length,
         itemBuilder: (context, index) {
           return Card(
@@ -190,7 +316,11 @@ class _AddCoursesPageState extends State<AddCoursesPage> {
                 ],
               ));
         },
-      ),
+      );
+
+    return Scaffold(
+      appBar: appBar,
+      body: _isSearchMode ? filteredListView : defaultListView
     );
   }
 }
